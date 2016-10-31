@@ -111,7 +111,7 @@ Output Format:
 ## Datasets
 * Networks form the [10th DIMACS'13 competition in Metis format](http://www.cc.gatech.edu/dimacs10/archive/clustering.shtml) with ground-truth modularity
 * Networks from [Standford SNAP](https://snap.stanford.edu/data/index.html#communities) (unweinghted *nse* format) with ground-truth clusters
-* [LFR Benchmark to produce synthetic networks]() in *nsa* format with ground-truth clusters
+* [LFR Benchmark to produce synthetic networks](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) in *nsa* format with ground-truth clusters
 
 ## Format Specification
 
