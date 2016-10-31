@@ -8,6 +8,7 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 - [Input Formats](#input-formats)
 - [Output Formats](#output-formats)
 - [Usage](usage)
+	- [Requirements](requirements)
 	- [Example](example)
 	- [Options](options)
 - [Format Specification](#format-specification)
@@ -34,6 +35,13 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 - *nsl* (stands for *nse/nsa* and includes SNAP, ncol and )
 
 ## Usage
+## Requirements
+
+The converter is written for the Python3 considering backward compatibility with Pyhon2 and PyPy. It is tested on Python3, but should also run on Python2 and PyPy.  
+There no any external dependencies.  
+
+The converter is implemented as a serial parser, i.e. it can process files of any size having very small memory footprint (until the `--remdup` option is specified to remove the duplicated links).
+
 ### Example
 ```
 $ ./convert.py tmp/karate.graph -i mts
