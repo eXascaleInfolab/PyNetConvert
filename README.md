@@ -7,10 +7,10 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 ## Content
 - [Input Formats](#input-formats)
 - [Output Formats](#output-formats)
-- [Usage](usage)
-	- [Requirements](requirements)
-	- [Example](example)
-	- [Options](options)
+- [Usage](#usage)
+	- [Requirements](#requirements)
+	- [Example](#example)
+	- [Options](#options)
 - [Format Specification](#format-specification)
 	- [RCG](#rcg)
 	- [MTS](#mts)
@@ -35,7 +35,7 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 - *nsl* (stands for *nse/nsa* and includes SNAP, ncol and )
 
 ## Usage
-## Requirements
+### Requirements
 
 The converter is written for the Python3 considering backward compatibility with Pyhon2 and PyPy. It is tested on Python3, but should also run on Python2 and PyPy.  
 There no any external dependencies.  
