@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-\descr: Datasets convertor from Pajek, Metis and .nsl formats (including .ncol
-and Stanford SNAP) to .nsl (.nse/a that are more common than .ncol, i.e. the
-output can be stanford .snap, but not .ncol because of the comment-header) and
-.rcg (Readable Compact Graph, former .hig; used by DAOC / HiReCS libs) formats.
+\descr: Datasets convertor from Pajek, Metis and .nsl formats (including .ncol,
+Stanford SNAP and Edge/Arcs Graph) to .nsl (.nse/a that are more common than .ncol,
+i.e. the output can be stanford .snap and .ncol) and .rcg (Readable Compact Graph,
+former .hig; used by DAOC / HiReCS libs) formats.
 
 Input formats:
 	- pajek network format: http://gephi.github.io/users/supported-graph-formats/pajek-net-format/
@@ -12,12 +12,13 @@ Input formats:
 	- nse  - nodes are specified in lines consisting of the single Space/tab
 		separated, possibly weighted Edge (undirected link, i.e. either AB or BA is
 		specified):  <src_id> <dst_id> [<weight>]
-		with '#' comments and selflinks, without backward directoin specification.
+		with '#' comments and selflinks, without backward direction specification.
 		The same as Stanford SNAP format: https://snap.stanford.edu/data/index.html#communities
 		Also known as [Weighted] Edge Graph: https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html
 	- nsa  - nodes are specified in lines consisting of the single Space/tab
 		separated, possibly weighted Arc (directed link): <src_id> <dst_id> <weight>
-		with '#' comments, selflinks and backward directoin specification:
+		with '#' comments, selflinks and backward direction specification that is
+		a [Weighted] Arcs Graph, a generalization of the LFR Benchmark generated networks:
 		https://sites.google.com/site/santofortunato/inthepress2
 
 Output formats:
@@ -754,14 +755,14 @@ def convertStream(fout, outfmt, finp, inpfmt, unweight, remdub, frcedg, commente
 	# are appropriate.
 
 	# Parse header only if exists and form resutls considering for the (un)directed case
-	assert inpfmt.parsed.directed is None and outfmt.printed.directed is None, 'Inicializatoin validation failed'
+	assert inpfmt.parsed.directed is None and outfmt.printed.directed is None, 'Inicialization validation failed'
 	#if not inpfmt.parseBlock(finp, True):
 	#	return
 	## Forse skip weights if required
 	#if unweight:
 	#	inpfmt.parsed.weighted = False
 	## Build the header
-	#assert outfmt.printed.directed is None and inpfmt.parsed.directed is not None, 'Inicializatoin validation failed'
+	#assert outfmt.printed.directed is None and inpfmt.parsed.directed is not None, 'Inicialization validation failed'
 	#outfmt.printBlock(fout, inpfmt.parsed, remdub, frcedg, commented)
 
 	# Parse the remained part(s) of the input file and build the output
