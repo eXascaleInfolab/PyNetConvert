@@ -1,16 +1,17 @@
 # PyNetConvert - Network (Graph, Dataset) Converter
-Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including *.ncol*, Stanford SNAP and Edge/Arcs Graph) to *.nsl* (*.nse/a* that are more common than *.ncol*, i.e. the output can be stanford *.snap* and *.ncol*) and *.rcg* (Readable Compact Graph, former *.hig*; used by DAOC / HiReCS libs) formats.
+Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including *.ncol*, Stanford SNAP and Edge/Arcs Graph) to *.nsl* (*.nse/a* that are more common than *.snap* and *.ncol*) and *.rcg* (Readable Compact Graph, former *.hig*; used by DAOC / HiReCS libs) formats.
 
-\author: (c) Artem Lutov <artem@exascale.info>  
+\author: Artem Lutov <artem@exascale.info>  
 (c) RCG (Readable Compact Graph)
 
 ## Content
 - [Input Formats](#input-formats)
 - [Output Formats](#output-formats)
+- [Requirements](#requirements)
 - [Usage](#usage)
-	- [Requirements](#requirements)
 	- [Example](#example)
 	- [Options](#options)
+- [Datasets](#datasets)
 - [Format Specification](#format-specification)
 	- [RCG](#rcg)
 	- [MTS](#mts)
@@ -18,29 +19,35 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 	- [NSL](#nsl)
 		- [NSE](#nse)
 		- [NSA](#nsa)
+- [Related Projects](#related-projects)
 
 ## Input formats
 - [*pajek* network](http://gephi.github.io/users/supported-graph-formats/pajek-net-format/)
 - [*metis* graph (network)](http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/manual.pdf)
 - *nse*  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Edge (undirected link, i.e. either AB or BA is specified):  `<src_id> <dst_id> [<weight>]`  
-		with '#' comments and selflinks, without backward directoin specification.  
+		with `#` comments and selflinks, without backward directoin specification.  
 		The same as [Stanford SNAP network format](https://snap.stanford.edu/data/index.html#communities)  
 		Also known as [[Weighted] Edge Graph](https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html)  
 		Optionally reduced to the [ncol format](http://lgl.sourceforge.net/#FileFormat)
 - *nsa*  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Arc (directed link): `<src_id> <dst_id> <weight>`  
-		with '#' comments, selflinks and backward direction specification that is a [Weighted] Arcs Graph, a generalization of the [LFR Benchmark generated networks](https://sites.google.com/site/santofortunato/inthepress2)
+		with `#` comments, selflinks and backward direction specification that is a [Weighted] Arcs Graph, a generalization of the [LFR Benchmark generated networks](https://sites.google.com/site/santofortunato/inthepress2)
 
 ## Output formats:
 - *rcg* format (former [*hig*](http://www.lumais.com/docs/hig_format.hig))
-- *nsl* (stands for *nse/nsa* and includes SNAP, ncol and )
+- *nsl* (stands for *nse/nsa* and includes SNAP, ncol and Edge/Arcs Graph)
+  - *snap* format is *nse* with removed weights (use `--unweight -o nse` options)
+  - *ncol* format is *snap* without the comments (use `--unweight --nocoms -o nse` options)
 
-## Usage
-### Requirements
+## Requirements
 
 The converter is written for the Python3 considering backward compatibility with Pyhon2 and PyPy. It is tested on Python3, but should also run on Python2 and PyPy.  
 There no any external dependencies.  
 
 The converter is implemented as a serial parser, i.e. it can process files of any size having very small memory footprint (until the `--remdup` option is specified to remove the duplicated links).
+
+## Usage
+
+Just run the converter with specidifed input and output formats. Some formats are automatically recognized by the file extension.
 
 ### Example
 ```
@@ -101,6 +108,11 @@ Output Format:
                         processing if such output file already exists
 ```
 
+## Datasets
+* Networks form the [10th DIMACS'13 competition in Metis format](http://www.cc.gatech.edu/dimacs10/archive/clustering.shtml) with ground-truth modularity
+* Networks from [Standford SNAP](https://snap.stanford.edu/data/index.html#communities) (unweinghted *nse* format) with ground-truth clusters
+* [LFR Benchmark to produce synthetic networks]() in *nsa* format with ground-truth clusters
+
 ## Format Specification
 
 ### RCG
@@ -144,10 +156,10 @@ Mts (INP)  - [Metis Graph (Network) format](http://glaros.dtc.umn.edu/gkhome/fet
 Pjk (INP)  - [Pajek Network format](https://gephi.org/users/supported-graph-formats/pajek-net-format/).  Node ids started with 1, both [weighted] arcs and edges might be present.. File extensions: pjk, pajek, net, pjn
 
 ### NSL
-Nsl  - nodes are specified in lines that consist of the single Space/tab separated, possibly weighted Links (Edges / Arcs).
+Nsl  - nodes graph specified by the newline separated links (edges/arcs), which are optionaly weighted.
 
 #### NSE
-Nse (INP, OUTP)  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Edge (undirected link). It is similar to the [ncol format](http://lgl.sourceforge.net/#FileFormat) and [[Weighted] Edge Graph](https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html), but self-edges are allowed to represent node weights and the line comment is allowed using "#" symbol.. File extensions: nse, snap, ncol. Specification:
+Nse (INP, OUTP)  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Edge (undirected link). It is similar to the [ncol format](http://lgl.sourceforge.net/#FileFormat) and [[Weighted] Edge Graph](https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html), but self-edges are allowed to represent node weights and the line comment is allowed using `#` symbol.. File extensions: nse, snap, ncol. Specification:
 ```
   # Comments start with '#', the header is optional:
   # Nodes: <nodes_num>	Edges: <edges_num>
@@ -160,7 +172,7 @@ Nse (INP, OUTP)  - nodes are specified in lines consisting of the single Space/t
   Weight is a non-negative floating point number.
 
 #### NSA
-Nsa (INP, OUTP)  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Arc (directed link), a self-arc can be used to represent the node weight and the line comment is allowed using "#" symbol.. File extensions: nsa. Specification:
+Nsa (INP, OUTP)  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Arc (directed link), a self-arc can be used to represent the node weight and the line comment is allowed using `#` symbol.. File extensions: nsa. Specification:
 ```
   # Comments start with '#', the header is optional:
   # Nodes: <nodes_num>	Arcs: <arcs_num>
@@ -171,3 +183,9 @@ Nsa (INP, OUTP)  - nodes are specified in lines consisting of the single Space/t
   The header is optional. The arcs (directed links) are unique and always in pairs, i.e. BA should be specified until it's weight is zero if AB is specified.  
   Id is a positive integer number (>= 1), id range is solid.  
   Weight is a non-negative floating point number.  
+
+## Related Projects
+- [PyCABeM](https://github.com/eXascaleInfolab/PyCABeM) - Python Benchmarking Framework for the Clustering Algorithms Evaluation. Uses extrinsic (NMIs) and intrinsic (Q) measures for the clusters quality evaluation considering overlaps (nodes membership by multiple clusters).
+- [LFR Benchmark](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) for Undirected Weighted Overlapping networks - generates synthetic networks in *nsa* format with ground-truth clustering to evaluate clusterign algorithms.
+
+**Note:** Please, [star this project](https://github.com/eXascaleInfolab/PyNetConvert) if you use it.
