@@ -1,5 +1,5 @@
-# PyNetConvert - Network (Graph, Dataset) Convertor
-Network (graph, dataset) convertor from Pajek, Metis and .nsl formats (including *.ncol*, Stanford SNAP and Edge/Arcs Graph) to *.nsl* (*.nse/a* that are more common than *.ncol*, i.e. the output can be stanford *.snap* and *.ncol*) and *.rcg* (Readable Compact Graph, former *.hig*; used by DAOC / HiReCS libs) formats.
+# PyNetConvert - Network (Graph, Dataset) Converter
+Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including *.ncol*, Stanford SNAP and Edge/Arcs Graph) to *.nsl* (*.nse/a* that are more common than *.ncol*, i.e. the output can be stanford *.snap* and *.ncol*) and *.rcg* (Readable Compact Graph, former *.hig*; used by DAOC / HiReCS libs) formats.
 
 \author: (c) Artem Lutov <artem@exascale.info>  
 (c) RCG (Readable Compact Graph)
