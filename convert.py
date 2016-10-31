@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-\descr: Datasets convertor from Pajek, Metis and .nsl formats (including .ncol,
+\descr: Datasets converter from Pajek, Metis and .nsl formats (including .ncol,
 Stanford SNAP and Edge/Arcs Graph) to .nsl (.nse/a that are more common than .ncol,
 i.e. the output can be stanford .snap and .ncol) and .rcg (Readable Compact Graph,
 former .hig; used by DAOC / HiReCS libs) formats.
