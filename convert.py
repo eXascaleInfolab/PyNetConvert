@@ -44,7 +44,7 @@ import time  # Required when the file should be renamed
 
 
 # Approximate block size in links (at list this number of links if not interrupted by the section completion)
-DEFAULT_BLOCK_LINKS = 1024
+DEFAULT_BLOCK_LINKS = 2048  # Page size is 4K, 1024 anyway will take more than 4K
 
 
 # Input Files Parsing ----------------------------------------------------------
