@@ -136,12 +136,12 @@ Mts (INP)  - [Metis Graph (Network) format](http://glaros.dtc.umn.edu/gkhome/fet
   > ATTENTION: The edges are conunted only once, but specified in each
           direction. The arcs must exist in both directions and their weights
           are symmetric, i.e. edges.  
-          
+
 - `format_bin` - up to `3` digits `{0, 1}`: `<vsized><vweighted><eweighted>`
   - `vsized`  - whether the size of each vertex is specified (vsize)  
   - `vweighted`  - whether the vertex weights are specified (`vweight_1 .. vweight_vmnum`)
   - `eweighted`  - whether edges weights are specified `eweight<i>`
-  
+
   > ATTENTION: When the fmt parameter is not provided, it is assumed that the vertex sizes, vertex WEIGHTS, and edge weights are all equal to 1 and NOT present in the file.
 
 - `vm_num`  - the number of weights in each vertex (not the number of edges)
@@ -156,7 +156,7 @@ Mts (INP)  - [Metis Graph (Network) format](http://glaros.dtc.umn.edu/gkhome/fet
 Pjk (INP)  - [Pajek Network format](https://gephi.org/users/supported-graph-formats/pajek-net-format/).  Node ids started with 1, both [weighted] arcs and edges might be present.. File extensions: pjk, pajek, net, pjn
 
 ### NSL
-Nsl  - nodes graph specified by the newline separated links (edges/arcs), which are optionaly weighted.
+Nsl  - [nodes graph specified by the newline separated links](https://github.com/eXascaleInfolab/PyCABeM/blob/master/formats/format.nsl) (edges/arcs), which are optionally weighted.
 
 #### NSE
 Nse (INP, OUTP)  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Edge (undirected link). It is similar to the [ncol format](http://lgl.sourceforge.net/#FileFormat) and [[Weighted] Edge Graph](https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html), but self-edges are allowed to represent node weights and the line comment is allowed using `#` symbol.. File extensions: nse, snap, ncol. Specification:
