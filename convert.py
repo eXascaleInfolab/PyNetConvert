@@ -369,7 +369,7 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 					did = int(v)
 				dest = [v, None]
 			elif not unweight:
-				dest[1] = v
+				dest[1] = v  #pylint: disable=E1137
 
 			if iparsed.weighted:
 				didval = not didval
@@ -412,7 +412,7 @@ def parseBlockPajek(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 			if not ln or ln[0] == inpfmt.symcmt:
 				continue
 			if ln[0] != hdrsym:
-				raise ValueError('The section header is missed: ' + line)
+				raise ValueError('The section header is missed: ' + ln)
 			# Parse initialization header (*Vertices setion)
 			ln = ln.split(None, 2)
 			ln[0] = ln[0].lower()
@@ -1126,4 +1126,4 @@ if __name__ == '__main__':
 	convert(parseArgs())
 
 
-__all__ = [convert, FormatSpec]
+__all__ = ["convert", "FormatSpec"]
