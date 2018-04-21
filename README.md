@@ -25,7 +25,7 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 - [*pajek* network](http://gephi.github.io/users/supported-graph-formats/pajek-net-format/)
 - [*metis* graph (network)](http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/manual.pdf)
 - *nse*  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Edge (undirected link, i.e. either AB or BA is specified):  `<src_id> <dst_id> [<weight>]`  
-		with `#` comments and selflinks, without backward directoin specification.  
+		with `#` comments and selflinks, without backward direction specification.  
 		The same as [Stanford SNAP network format](https://snap.stanford.edu/data/index.html#communities)  
 		Also known as [[Weighted] Edge Graph](https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html)  
 		Optionally reduced to the [ncol format](http://lgl.sourceforge.net/#FileFormat)
@@ -47,7 +47,7 @@ The converter is implemented as a serial parser, i.e. it can process files of an
 
 ## Usage
 
-Just run the converter with specidifed input and output formats. Some formats are automatically recognized by the file extension.
+Just run the converter with specified input and output formats. Some formats are automatically recognized by the file extension.
 
 ### Example
 ```
@@ -88,7 +88,7 @@ Input Format:
 Additional Modifiers:
   -d, --remdup          remove duplicated links to have unique ones
   -e, --frcedg          force edges output even in case of ars input: the
-                        output edge is created by the first occurrance of the
+                        output edge is created by the first occurrence of the
                         input link (edge/arc) and has weight of this link
                         omitting the subsequent back link (if exists)
   -u, --unweight        force links to be unweighted instead of having the
@@ -186,6 +186,6 @@ Nsa (INP, OUTP)  - nodes are specified in lines consisting of the single Space/t
 
 ## Related Projects
 - [PyCABeM](https://github.com/eXascaleInfolab/PyCABeM) - Python Benchmarking Framework for the Clustering Algorithms Evaluation. Uses extrinsic (NMIs) and intrinsic (Q) measures for the clusters quality evaluation considering overlaps (nodes membership by multiple clusters).
-- [LFR Benchmark](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) for Undirected Weighted Overlapping networks - generates synthetic networks in *nsa* format with ground-truth clustering to evaluate clusterign algorithms.
+- [LFR Benchmark](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) for Undirected Weighted Overlapping networks - generates synthetic networks in *nsa* format with ground-truth clustering to evaluate clustering algorithms.
 
 **Note:** Please, [star this project](https://github.com/eXascaleInfolab/PyNetConvert) if you use it.
