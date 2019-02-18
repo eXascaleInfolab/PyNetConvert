@@ -1,5 +1,5 @@
 # PyNetConvert - Network (Graph, Dataset) Converter
-Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including *.ncol*, Stanford SNAP and Edge/Arcs Graph) to *.nsl* (*.nse/a* that are more common than *.snap* and *.ncol*) and *.rcg* (Readable Compact Graph, former *.hig*; used by DAOC / HiReCS libs) formats.
+Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including *.ncol*, Stanford SNAP and Edge/Arcs Graph) to *.nsl* (*.nse/a* that are more common than *.snap* and *.ncol*) and *.rcg* (Readable Compact Graph, former *.hig*; used by DAOC / HiReCS libs) formats. Additionally, an adjacency matrix conversion from the Mathlab (*.mat*) format to *.nsl* is provided by the dedicated script (`matToNsl`).
 
 \author: Artem Lutov <artem@exascale.info>  
 (c) RCG (Readable Compact Graph)
@@ -11,6 +11,7 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 - [Usage](#usage)
 	- [Example](#example)
 	- [Options](#options)
+	- [matToNsl Options](#matToNsl-options)
 - [Datasets](#datasets)
 - [Format Specification](#format-specification)
 	- [RCG](#rcg)
@@ -25,29 +26,28 @@ Network (graph, dataset) converter from Pajek, Metis and .nsl formats (including
 - [*pajek* network](http://gephi.github.io/users/supported-graph-formats/pajek-net-format/)
 - [*metis* graph (network)](http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/manual.pdf)
 - *nse*  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Edge (undirected link, i.e. either AB or BA is specified):  `<src_id> <dst_id> [<weight>]`  
-		with `#` comments and selflinks, without backward directoin specification.  
+		with `#` comments and selflinks, without backward direction specification.  
 		The same as [Stanford SNAP network format](https://snap.stanford.edu/data/index.html#communities)  
 		Also known as [[Weighted] Edge Graph](https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html)  
 		Optionally reduced to the [ncol format](http://lgl.sourceforge.net/#FileFormat)
 - *nsa*  - nodes are specified in lines consisting of the single Space/tab separated, possibly weighted Arc (directed link): `<src_id> <dst_id> <weight>`  
 		with `#` comments, selflinks and backward direction specification that is a [Weighted] Arcs Graph, a generalization of the [LFR Benchmark generated networks](https://sites.google.com/site/santofortunato/inthepress2)
+> Mathlab (.mat) adjacency matrix conversion to the *nsl* (*nse*/*nsa*) only format is performed by the [`matToNsl.py`](matToNsl.py) script.
 
-## Output formats:
+## Output formats
 - *rcg* format (former [*hig*](http://www.lumais.com/docs/hig_format.hig))
 - *nsl* (stands for *nse/nsa* and includes SNAP, ncol and Edge/Arcs Graph)
   - *snap* format is *nse* with removed weights (use `--unweight -o nse` options)
   - *ncol* format is *snap* without the comments (use `--unweight --nocoms -o nse` options)
 
 ## Requirements
-
 The converter is written for the Python3 considering backward compatibility with Pyhon2 and PyPy. It is tested on Python3, but should also run on Python2 and PyPy.  
 There no any external dependencies.  
 
 The converter is implemented as a serial parser, i.e. it can process files of any size having very small memory footprint (until the `--remdup` option is specified to remove the duplicated links).
 
 ## Usage
-
-Just run the converter with specidifed input and output formats. Some formats are automatically recognized by the file extension.
+Just run the converter with specified input and output formats. Some formats are automatically recognized by the file extension.
 
 ### Example
 ```
@@ -108,13 +108,28 @@ Output Format:
                         processing if such output file already exists
 ```
 
+### matToNsl Options
+```
+$ ./matToNsl.py -h
+usage: matToNsl.py [-h] [-d] MatNet [MatNet ...]
+
+Network converter from mathlab format to .nsl (nse/nsa).
+
+positional arguments:
+  MatNet          unsigned input network in the .mat format
+
+optional arguments:
+  -h, --help      show this help message and exit
+  -d, --directed  form directed output network from possibly directed input
+                  network
+```
+
 ## Datasets
 * Networks form the [10th DIMACS'13 competition in Metis format](http://www.cc.gatech.edu/dimacs10/archive/clustering.shtml) with ground-truth modularity
 * Networks from [Standford SNAP](https://snap.stanford.edu/data/index.html#communities) (unweinghted *nse* format) with ground-truth clusters
 * [LFR Benchmark to produce synthetic networks](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) in *nsa* format with ground-truth clusters
 
 ## Format Specification
-
 ### RCG
 Rcg (OUTP)  - Readable Compact Graph format (former hig), native input format of DAOC. This format is similar to Pajek, but ids can start from any non-negative number and might not form a solid range. RCG is a readable and compact network format suitable for the evolving networks.. File extensions: rcg, hig
 
@@ -133,7 +148,7 @@ Mts (INP)  - [Metis Graph (Network) format](http://glaros.dtc.umn.edu/gkhome/fet
 - `ertices_num`  - the number of vertices in the network (graph)
 - `endges_num`  - the number of edges (not directed, A-B and B-A counted
       as a single edge)
-  > ATTENTION: The edges are conunted only once, but specified in each
+  > ATTENTION: The edges are counted only once, but specified in each
           direction. The arcs must exist in both directions and their weights
           are symmetric, i.e. edges.  
 
@@ -185,7 +200,7 @@ Nsa (INP, OUTP)  - nodes are specified in lines consisting of the single Space/t
   Weight is a non-negative floating point number.  
 
 ## Related Projects
-- [PyCABeM](https://github.com/eXascaleInfolab/PyCABeM) - Python Benchmarking Framework for the Clustering Algorithms Evaluation. Uses extrinsic (NMIs) and intrinsic (Q) measures for the clusters quality evaluation considering overlaps (nodes membership by multiple clusters).
-- [LFR Benchmark](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) for Undirected Weighted Overlapping networks - generates synthetic networks in *nsa* format with ground-truth clustering to evaluate clusterign algorithms.
+- [Clubmark](https://github.com/eXascaleInfolab/clubmark) - A parallel isolation framework for benchmarking and profiling clustering (community detection) algorithms considering overlaps (covers).
+- [LFR Benchmark](https://github.com/eXascaleInfolab/LFR-Benchmark_UndirWeightOvp) for Undirected Weighted Overlapping networks - generates synthetic networks in *nsa* format with ground-truth clustering to evaluate clustering algorithms.
 
 **Note:** Please, [star this project](https://github.com/eXascaleInfolab/PyNetConvert) if you use it.
