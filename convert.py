@@ -3,34 +3,34 @@
 """
 :Description: Datasets converter from Pajek, Metis and .nsl formats (including .ncol,
 Stanford SNAP and Edge/Arcs Graph) to .nsl (.nse/a that are more common than .ncol,
-i.e. the output can be stanford .snap and .ncol) and .rcg (Readable Compact Graph,
+i.e. the output can be Stanford .snap and .ncol) and .rcg (Readable Compact Graph,
 former .hig; used by DAOC / HiReCS libs) formats.
 
 Input formats:
-	- pajek network format: http://gephi.github.io/users/supported-graph-formats/pajek-net-format/
-	- metis graph (network) format: http://people.sc.fsu.edu/~jburkardt/data/metis_graph/metis_graph.html
+	- Pajek network format: http://gephi.github.io/users/supported-graph-formats/pajek-net-format/
+	- Metis graph (network) format: http://people.sc.fsu.edu/~jburkardt/data/metis_graph/metis_graph.html
 		http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/manual.pdf
-	- nse  - nodes are specified in lines consisting of the single Space/tab
+	- NSE  - nodes are specified in lines consisting of the single Space/tab
 		separated, possibly weighted Edge (undirected link, i.e. either AB or BA is
 		specified):  <src_id> <dst_id> [<weight>]
-		with '#' comments and selflinks, without backward direction specification. Nodes have unsigned id,
-		the starting id is not fix. Ids might form non-soild range, e.g. {2,4,5,8}.
+		with '#' comments and self-links, without backward direction specification. Nodes have unsigned id,
+		the starting id is not fix. Ids might form non-solid range, e.g. {2,4,5,8}.
 		The specializations are:
 		Link List format (http://www.mapequation.org/code.html#Link-list-format)
 		also known as Stanford SNAP format: https://snap.stanford.edu/data/index.html#communities
 		and [Weighted] Edge Graph (https://www.cs.cmu.edu/~pbbs/benchmarks/graphIO.html)
 		where node ids start from 1 and form a single solid range. Edge Graph format does not include comments.
-	- nsa  - nodes are specified in lines consisting of the single Space/tab
+	- NSA  - nodes are specified in lines consisting of the single Space/tab
 		separated, possibly weighted Arc (directed link): <src_id> <dst_id> <weight>
-		with '#' comments, selflinks and backward direction specification that is
+		with '#' comments, self-links and backward direction specification that is
 		a [Weighted] Arcs Graph, a generalization of the LFR Benchmark generated networks:
 		https://sites.google.com/site/santofortunato/inthepress2
 
 Output formats:
 	- rcg format: http://www.lumais.com/docs/format.rcg  (hig_format.hig)
-	- nsl (stands for nse/nsa)
+	- nsl (stands for NSE/NSA)
 
-Note: works on both Python3 and Python2 / pypy
+Note: works on both Python3 and Python2 / PyPy
 
 (c) RCG (Readable Compact Graph)
 :Authors: Artem Lutov <luart@ya.ru>
@@ -96,13 +96,13 @@ def outName(finpName, outfmt):
 
 
 def parseSingleLink(line):
-	"""Parse a single link havein th format: src dst [weight]
+	"""Parse a single link having the format: src dst [weight]
 
 	line  - non-empty line of the input text that starts from a non-space symbol
 
 	return  [src_str, dst_str, weight_str | None],
 	"""
-	line = line.split(None, 3)  # Ending comments are not allowed, but required unweighed link might contain input weight
+	line = line.split(None, 3)  # Ending comments are not allowed, but required unweighted link might contain input weight
 	assert len(line) >= 2 and  line[0][0].isdigit() and line[1][0].isdigit(), (
 		'src and dst must exist and be digits')
 	if len(line) == 2:
@@ -115,7 +115,7 @@ def parseSingleLink(line):
 
 def parseBlockNsl(directed):
 	"""Parse NSE or NSA input block
-	directed  - arcs (nsa), otherwise edges (nse)
+	directed  - arcs (NSA), otherwise edges (NSE)
 	"""
 	assert isinstance(directed, bool)
 	def parser(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
@@ -127,7 +127,7 @@ def parseBlockNsl(directed):
 		blsnum  - approximate block size in links (at list this number of links
 			if not interrupted by the section completion)
 
-		return parsing  - whether the parsng is not completed yet
+		return parsing  - whether the parsing is not completed yet
 		"""
 		# NSL[A,E] format:
 		# # Comments are marked with '#' symbol
@@ -138,9 +138,9 @@ def parseBlockNsl(directed):
 		# ...
 		# where:
 		#  nodes_num  - the number of nodes (vertices) in the network (graph)
-		#  Links  - are either Edges (for the undirected network) or Arcs (for the direted network)
+		#  Links  - are either Edges (for the undirected network) or Arcs (for the directed network)
 		#  links_num  - the number of <links> (edges or arcs) in the network
-		#  weighted = {0, 1}  - wether the network is weighted or not, default: 1
+		#  weighted = {0, 1}  - whether the network is weighted or not, default: 1
 		#
 		#  src_id  - source node id >=0
 		#  dst_id  - destination node id >=0
@@ -167,7 +167,7 @@ def parseBlockNsl(directed):
 					if word == hdrmark and len(ln) > len(hdrmark):
 						ln = ln[len(hdrmark):]
 						# Consider commas if present (allow both comma and space separators)
-						# and convert them to spaces for the unified provessing
+						# and convert them to spaces for the unified processing
 						ln = ' '.join(ln.split(',', 2))
 						# Replace ':' -> ': ' to allow Nodes:<nodes_num> having unified parsing
 						ln = ': '.join(ln.split(':', 2))
@@ -187,7 +187,7 @@ def parseBlockNsl(directed):
 								elif len(ln) > i:
 									raise ValueError('The header is invalid or inconsistent with the file type ({}): {}'
 										.format('nsa' if inpfmt.parsed.directed else 'nse', ' '.join(ln)))
-						# Note: the links will be paesed in the payload
+						# Note: the links will be parsed in the payload
 				else:
 					# This is the first link, define whether all links weighted using it
 					ln = parseSingleLink(ln)
@@ -203,7 +203,7 @@ def parseBlockNsl(directed):
 		else:
 			inpfmt.parsed.newsection = False
 			assert inpfmt.parsed.nextlink and len(inpfmt.parsed.nextlink) == 3, (
-				'Next parsing block should be already preparsed and should have'
+				'Next parsing block should be already pre-parsed and should have'
 				' the following format: [src, dst, weight]')
 			inpfmt.parsed.links.clear()  # Note: .clear() for arrays only is not compatible with Python2
 			snd = inpfmt.parsed.nextlink[0]
@@ -240,7 +240,7 @@ def parseBlockNsl(directed):
 
 
 def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
-	"""Meits format parser
+	"""Metis format parser
 
 	inpfmt  - input format
 	finp  - input stream
@@ -248,7 +248,7 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 	blsnum  - approximate block size in links (at list this number of links
 		if not interrupted by the section completion)
 
-	return parsing  - whether the parsng is not completed yet
+	return parsing  - whether the parsing is not completed yet
 	"""
 	# Metis format of the input graph (.graph):
 	# % Comments are marked with '%' symbol
@@ -262,7 +262,7 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 	#  vertices_num  - the number of vertices in the network (graph)
 	#  endges_num  - the number of edges (not directed, A-B and B-A counted
 	#      as a single edge).
-	#  	ATTENTION: the edges are conunted only once, but specified in each direction.
+	#  	ATTENTION: the edges are counted only once, but specified in each direction.
 	#		The arcs must exist in both directions and their weights are symmetric, i.e. edges.
 	#  format_bin - up to 3 digits {0, 1}: <vsized><vweighted><eweighted>
 	#      vsized  - whether the size of each vertex is specified (vsize), usually 0
@@ -283,8 +283,8 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 	if iparsed.directed is None:
 		assert not iparsed.links, 'There should not be any parsed links on start'
 		# ATTENTION: Metis links are treated specially here: they are specified as arcs,
-		# but interntionally reduced to the edges with correspondance to the format specificaiton.
-		iparsed.directed = False  # Treat links as edges even considering that they are specified in both directions because the weights in Metis are always symmentric
+		# but intentionally reduced to the edges with correspondence to the format specification.
+		iparsed.directed = False  # Treat links as edges even considering that they are specified in both directions because the weights in Metis are always symmetric
 		iparsed.startid = 1  # ATTENTION: vertices id in Metis start from 1
 		iparsed.newsection = True
 		# Identify whether edges or links are specified
@@ -342,11 +342,11 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 		# Skip empty lines and comments except the header
 		if not ln or ln[0] == inpfmt.symcmt:
 			continue
-		# Note: iparsed.nextlink is not nesessary here, because each line represents the block
+		# Note: iparsed.nextlink is not necessary here, because each line represents the block
 		ln = ln.split()
 		assert len(ln) >= iparsed._selfsize + iparsed._swsize
 		i = 0  # Index in the line tokens
-		# Skip the node (vernex) size if exist
+		# Skip the node (vertex) size if exist
 		if iparsed._selfsize:
 			i += 1
 		# Parse vertex weights
@@ -382,7 +382,7 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 		# Remove empty entries
 		if not slinks:
 			del iparsed.links[snd]
-		# Finalize the sting parcing
+		# Finalize the sting parsing
 		iparsed._sid += 1
 		if lnsformed < blsnum:
 			snd = str(iparsed._sid)
@@ -393,7 +393,7 @@ def parseBlockMetis(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 
 
 def parseBlockPajek(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
-	"""Meits format parser
+	"""Pajek format parser
 
 	inpfmt  - input format
 	finp  - input stream
@@ -401,7 +401,7 @@ def parseBlockPajek(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 	blsnum  - approximate block size in links (at list this number of links
 		if not interrupted by the section completion)
 
-	return parsing  - whether the parsng is not completed yet
+	return parsing  - whether the parsing is not completed yet
 	"""
 	# Parse a new Pajek Section / Header
 	hdrsym = '*'  # Header symbol
@@ -416,7 +416,7 @@ def parseBlockPajek(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 				continue
 			if ln[0] != hdrsym:
 				raise ValueError('The section header is missed: ' + ln)
-			# Parse initialization header (*Vertices setion)
+			# Parse initialization header (*Vertices section)
 			parts = ln.split(None, 2)
 			parts[0] = parts[0].lower()
 			if iparsed.newsection is None:
@@ -512,16 +512,16 @@ class ParsedData(object):
 		self.startid = None  # The lowest node (vertex) id in the input network
 		# Payload data. Note: cleared in the parser and should not be modified outside it
 		self.links = {}  # src links: list(list(<dest_str>, <weight_str> | None), ...), not dict() because we do not know the output type on input
-		# Prepased data for the following iteration
+		# Pre-parsed data for the following iteration
 		self.nextlink = []  # list(<src_str>, <dst_str>, <weight_str> | None)
 
 
 class PrintedData(object):
 	"""Printed data: state data between the incremental prints"""
 	def __init__(self):
-		# ATTENTION: directed and weighted shuold be set only once for .nsl, but can vary for .rcg
+		# ATTENTION: directed and weighted should be set only once for .nsl, but can vary for .rcg
 		self.directed = None  # Whether the previously printed section was directed (applies to the whole file for .nsl)
-		# Accumulated data to be printed, actual only when remdub (duplicates removement is performed)
+		# Accumulated data to be printed, actual only when 'remdub' (duplicates removal is performed)
 		# ATTENTION: initial weighted = None for ParsedData, BUT True for the PrintedData
 		self.weighted = True  # Whether the output file is globally weighted; True if ParsedData.weighted is None
 		self.ndslinks = {}  # Nodes and links, dict of dict
@@ -540,7 +540,7 @@ def printLinks(outfmt, printer, parsed, remdub, final):
 	"""
 	# Print the body (payload) block
 	assert printer and callable(printer)
-	# ATTENTION: all links are stored globally in the pinted.ndslinks only when remdub
+	# ATTENTION: all links are stored globally in the printed.ndslinks only when remdub
 	# Print already accumulated links if a new section is started
 	if parsed.newsection and outfmt.printed.ndslinks:
 		printer(outfmt.printed.ndslinks)
@@ -581,7 +581,7 @@ def printLinks(outfmt, printer, parsed, remdub, final):
 			# Print result to the output file
 			for ndls in viewitems(parsed.links):
 				printer(ndls[1], ndls[0], not parsed.directed and outfmt.printed.directed)
-				# Note: the reminer is skipped here, this edges will be constructed by the backlinks
+				# Note: the reminder is skipped here, this edges will be constructed by the back-links
 				# Update the total number of outputted arcs
 				outfmt.printed.arcstot += len(ndls[1]) * (1 + (not outfmt.printed.directed or not parsed.directed))
 
@@ -613,13 +613,13 @@ def printBlockRcg(outfmt, fout, parsed, remdub, frcedg, commented, unweight, fin
 	# Print the parsed header if required
 	if parsed.newsection is None or parsed.newsection:
 		# Allow implicit conversion of edges into arcs by the output format specification,
-		# however this requires arcs accumulation if dublicates check is required
+		# however this requires arcs accumulation if duplicates check is required
 		if parsed.directed and frcedg:
 			print('WARNING, arcs -> edges conversion will be inaccurate in case arcs'
 				  ' have distinct forth and back weights', file=sys.stderr)
 		# Print the initial header only once
 		if outfmt.printed.directed is None:
-			# Update PtindedData parameters
+			# Update PrintedData parameters
 			outfmt.printed.directed = parsed.directed and not frcedg
 			print('Parsed weighted: {}, newsection: {}'.format(parsed.weighted, parsed.newsection))
 			if unweight or parsed.weighted is not None:
@@ -637,9 +637,9 @@ def printBlockRcg(outfmt, fout, parsed, remdub, frcedg, commented, unweight, fin
 		"""RCG links printer
 
 		links  - the links to be printed, either list of (dest, weight), or dict of dict.
-			None is used as a special value to output the ending commnet (number of arcs, etc.)
+			None is used as a special value to output the ending comment (number of arcs, etc.)
 		src  - source id if links are list, otherwise None
-		makeback  - add backlink (when edges are conveted to the arcs)
+		makeback  - add back-link (when edges are converted to the arcs)
 		"""
 		def linkToStream(fout, link):
 			"""Output link to the stream
@@ -659,7 +659,7 @@ def printBlockRcg(outfmt, fout, parsed, remdub, frcedg, commented, unweight, fin
 			fout.write(src + '>')
 			for link in links:
 				linkToStream(fout, link)
-				# Note: links uniques and existence of the back links is validated on the insertion (links with lower src than dst are omitted for the edges)!
+				# Note: links uniqueness and existence of the back links is validated on the insertion (links with lower src than dst are omitted for the edges)!
 			fout.write('\n')
 			# Make back links for the edges -> arcs
 			if makeback:
@@ -668,8 +668,8 @@ def printBlockRcg(outfmt, fout, parsed, remdub, frcedg, commented, unweight, fin
 					ndls = outfmt.printed.ndslinks.setdefault(link[0], {})
 					ndls[src] = link[1]  # Overwrite dest if exists
 		elif links is not None:
-			# ATTENTION: backlinks are already considered in the accumulated links
-			# Accumulated links of the whole nework are dict of dict
+			# ATTENTION: back-links are already considered in the accumulated links
+			# Accumulated links of the whole network are dict of dict
 			for ndls in viewitems(links):
 				fout.write(ndls[0] + '>')
 				for link in viewitems(ndls[1]):
@@ -704,7 +704,7 @@ def printBlockNsl(directed):
 		# Implicitly force remdub if required
 		if parsed.directed and not directed and not remdub:
 			if outfmt.printed.directed is None:  # Print it only once
-				print('WARNING, duplicates removement is not specified for the arcs -> edges'
+				print('WARNING, duplicates removal is not specified for the arcs -> edges'
 					' conversion and is forced implicitly to not produce any duplicated edges', file=sys.stderr)
 			remdub = True
 		# Print the parsed header if required
@@ -718,12 +718,12 @@ def printBlockNsl(directed):
 				if frcedg and directed:
 					raise ValueError('Edges output can not be forced into the Arcs output'
 						' file and vice versa, frcedg: {}, directed: {}'.format(frcedg, directed))
-				# Update PtindedData parameters
+				# Update PrintedData parameters
 				outfmt.printed.directed = directed
 				if unweight or parsed.weighted is not None:
 					assert outfmt.printed.weighted, 'A graph should be weighted by default'
 					outfmt.printed.weighted = not unweight and parsed.weighted
-				# Output the dataset desciption (initializeing header)
+				# Output the data set description (initializing header)
 				if parsed.ndsnum and commented:
 					fout.write('{} Nodes: {}'.format(outfmt.symcmt, parsed.ndsnum))
 					if parsed.lnsnum:  # not outfmt.printing.initialized and
@@ -742,9 +742,9 @@ def printBlockNsl(directed):
 							'Arcs' if outfmt.printed.directed else 'Edges'
 							, linksnum, int(outfmt.printed.weighted)))
 					# ATTENTION: Header should be without empty lines, only comments,
-					# othewise some algorithms (GANXiS) fails to parse it
+					# otherwise some algorithms (GANXiS) fails to parse it
 					fout.write('\n')
-				# Output the dataset format notation
+				# Output the data set format notation
 				if commented:
 					fout.write('{0}\n{0} src\tdst{1}\n'.format(outfmt.symcmt, '\tweight'
 						# ATTENTION: weighted might be None, which should be counted as default True
@@ -759,9 +759,9 @@ def printBlockNsl(directed):
 			"""NSL(E/A) links printer
 
 			links  - the links to be printed, either list of (dest, weight), or dict of dict.
-				None is used as a special value to output the ending commnet (number of arcs, etc.)
+				None is used as a special value to output the ending comment (number of arcs, etc.)
 			src  - source id if links are list, otherwise None
-			makeback  - add backlink (when edges are conveted to the arcs)
+			makeback  - add back-link (when edges are converted to the arcs)
 			"""
 			def linkToStr(src, link):
 				"""Convert link to string representation
@@ -788,8 +788,8 @@ def printBlockNsl(directed):
 					assert outfmt.printed.directed, 'Incompatible flags used flags'
 					fout.writelines([linkToStr(link[0], (src, link[1])) for link in links])
 			elif links is not None:
-				# ATTENTION: backlinks are already considered in the accumulated links
-				# Accumulated links of the whole nework are dict of dict
+				# ATTENTION: back-links are already considered in the accumulated links
+				# Accumulated links of the whole network are dict of dict
 				for ndls in viewitems(links):
 					fout.writelines([linkToStr(ndls[0], link) for link in viewitems(ndls[1])])
 			elif commented:
@@ -816,16 +816,16 @@ def convertStream(fout, outfmt, finp, inpfmt, unweight, remdub, frcedg, commente
 	commented  - allow comments in the output file, i.e. headers in the .nsl format
 	"""
 	# Note: Both .rcg and .nsl(e/a) output formats can contain links in the
-	# arbitrary order, so the per-block input parcing with per-block output forming
+	# arbitrary order, so the per-block input parsing with per-block output forming
 	# are appropriate.
 
 	# Parse header only if exists and form results considering for the (un)directed case
-	assert inpfmt.parsed.directed is None and outfmt.printed.directed is None, 'Inicialization validation failed'
+	assert inpfmt.parsed.directed is None and outfmt.printed.directed is None, 'Initialization validation failed'
 
 	# Parse the remained part(s) of the input file and build the output
 	while inpfmt.parseBlock(finp, unweight):  # DEFAULT_BLOCK_LINKS
 		outfmt.printBlock(fout, inpfmt.parsed, remdub, frcedg, commented, unweight)
-	# Finalize the outut
+	# Finalize the output
 	outfmt.printBlock(fout, inpfmt.parsed, remdub, frcedg, commented, unweight, True)
 
 
@@ -835,13 +835,13 @@ class FormatSpec(object):
 	def __init__(self, fid, symcmt, descr, parser=None, printer=None, fmt=None, fmtdescr=None, exts=None):
 		"""Initialization of the format specification:
 
-		id  - format id, should be a unique string. preferaly readable and meaningful
+		id  - format id, should be a unique string. preferably readable and meaningful
 		symcmt  - comment symbol
 		descr  - format description
 		parser  - function that parses this format
 		printer  - function that prints this format
 		fmt  - formal self specification of the format
-		fmtdescr  - desription of the formal specification
+		fmtdescr  - description of the formal specification
 		exts  - tuple of extensions of the files without the leading '.'. Default: (<id>,)
 		"""
 		assert (isinstance(fid, str) and isinstance(descr, str) and (fmt is None or isinstance(fmt, str))
@@ -952,7 +952,7 @@ def inputFormats():
 {0}Weight is a non-negative floating point number.""".format(ntspan))
 
 	mts = FormatSpec('mts', '%'
-		, 'metis graph (network) format: http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/manual.pdf'
+		, 'Metis graph (network) format: http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/manual.pdf'
 		, parser=parseBlockMetis, fmt=
 """
 {0}% Comments start with '%' symbol
@@ -966,7 +966,7 @@ def inputFormats():
 """{0}vertices_num  - the number of vertices in the network (graph)
 {0}endges_num  - the number of edges (not directed, A-B and B-A counted
 {0}    as a single edge)
-{0}      ATTENTION: the edges are conunted only once, but specified in each
+{0}      ATTENTION: the edges are counted only once, but specified in each
 {0}        direction. The arcs must exist in both directions and their weights
 {0}        are symmetric, i.e. edges.
 {0}format_bin - up to 3 digits {{0, 1}}: <vsized><vweighted><eweighted>
@@ -1012,7 +1012,7 @@ def convert(args):
 			.format(args.network, args.unweight, args.remdub, args.frcedg, args.inpfmt.id
 				, args.resolve, args.outfmt.id, args.commented))
 		if args.frcedg:
-			args.remdub = True  # Forse in case of frcedg
+			args.remdub = True  # Force in case of frcedg
 		foutName = outName(args.network, args.outfmt)
 		# Check whether output file exists
 		exists = os.path.exists(foutName)
@@ -1059,13 +1059,13 @@ def parseArgs(params=None):
 	"""
 	# Initialize I/O formats
 	inpfmts = inputFormats()
-	# TODO: add link to the convert/format.rcg and update the file with the selflink
+	# TODO: add link to the convert/format.rcg and update the file with the self-link
 	rcg = FormatSpec('rcg', '#', 'readable compact graph format (former hig), native'
 		' input format of DAOC. This format is similar to Pajek, but ids can start'
 		' from any non-negative number and might not form a solid range. RCG is a'
 		' readable and compact network format suitable for the evolving networks.'
-# Headers have weighted attribute to represented optinally weighted lists of links (edges or arvs).
-# Node weigh is specified via selflink(s). Weights are explicitly separated from ids for the readability.', printer=printBlockRcg
+	# Headers have weighted attribute to represented optionally weighted lists of links (edges or arcs).
+	# Node weigh is specified via self-link(s). Weights are explicitly separated from ids for the readability.', printer=printBlockRcg
 		, printer=printBlockRcg, exts=('rcg', 'hig'))
 
 	# Specify and process input arguments
@@ -1089,7 +1089,7 @@ def parseArgs(params=None):
 		, help='remove duplicated links to have unique ones')
 	mpars.add_argument('-e', '--frcedg', dest='frcedg', action='store_true'
 		, help='force edges output even in case of ars input: the output edge'
-		' is created by the first occurrance of the input link (edge/arc) and has'
+		' is created by the first occurrence of the input link (edge/arc) and has'
 		' weight of this link omitting the subsequent back link (if exists)')
 	mpars.add_argument('-u', '--unweight', dest='unweight', action='store_true'
 		, help='force links to be unweighted instead of having the input weights')
@@ -1111,7 +1111,7 @@ def parseArgs(params=None):
 	args = parser.parse_args(params)
 	#print('Args: ' + ' '.join(dir(args)))
 
-	# Show detailed format specifiction and exit if required
+	# Show detailed format specification and exit if required
 	if args.showfmt:
 		allfmts = [rcg]
 		allfmts.extend(viewvalues(inpfmts))

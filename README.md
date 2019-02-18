@@ -88,7 +88,7 @@ Input Format:
 Additional Modifiers:
   -d, --remdup          remove duplicated links to have unique ones
   -e, --frcedg          force edges output even in case of ars input: the
-                        output edge is created by the first occurrance of the
+                        output edge is created by the first occurrence of the
                         input link (edge/arc) and has weight of this link
                         omitting the subsequent back link (if exists)
   -u, --unweight        force links to be unweighted instead of having the
