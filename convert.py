@@ -38,8 +38,11 @@ Note: works on both Python3 and Python2 / pypy
 	Lumais <http://www.lumais.com/>
 :Date: 2016-10
 """
-
 from __future__ import print_function, division  # Required for stderr output, must be the first import
+# Exporting Functions
+__all__ = ["convert", "FormatSpec"]
+
+
 # Required to efficiently traverse items of dictionaries in both Python 2 and 3
 try:
 	from future.utils import viewitems, viewkeys, viewvalues  # External package: pip install future
@@ -414,26 +417,26 @@ def parseBlockPajek(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 			if ln[0] != hdrsym:
 				raise ValueError('The section header is missed: ' + ln)
 			# Parse initialization header (*Vertices setion)
-			ln = ln.split(None, 2)
-			ln[0] = ln[0].lower()
+			parts = ln.split(None, 2)
+			parts[0] = parts[0].lower()
 			if iparsed.newsection is None:
 				# *Vertices <vnum>,
 				assert not iparsed.links, 'There should not be any parsed links on start'
 				iparsed.startid = 1  # ATTENTION: vertices id in Pajek start from 1
 				# The number of Vertices if specified
-				if ln[0] == '*vertices':
-					iparsed.ndsnum = int(ln[1])
+				if parts[0] == '*vertices':
+					iparsed.ndsnum = int(parts[1])
 					# Skip this section
-					for ln in finp:
+					for ln in finp:  #pylint: disable=W0621
 						#ln = ln.lstrip()
 						if not ln or ln[0] != hdrsym:
 							continue
 						break
 					if not ln:
 						return False  # End of the file
-					ln = ln.rsplit(None, 1)
-					ln[0] = ln[0].lower()
-			iparsed._nexthdr = ln[0]
+					parts = ln.rsplit(None, 1)
+					parts[0] = parts[0].lower()
+			iparsed._nexthdr = parts[0]
 			break
 
 	# Parse the following section if required
@@ -445,7 +448,7 @@ def parseBlockPajek(inpfmt, finp, unweight, blsnum=DEFAULT_BLOCK_LINKS):
 		elif iparsed._nexthdr.startswith('*edges'):
 			iparsed.directed = False
 		else:
-			raise ValueError('Invalid section header: ' + ln[0])
+			raise ValueError('Invalid section header: ' + parts[0])
 		# Identify whether the section has a list-type
 		if iparsed._nexthdr.endswith('list'):
 			iparsed.weighted = False
@@ -639,6 +642,12 @@ def printBlockRcg(outfmt, fout, parsed, remdub, frcedg, commented, unweight, fin
 		makeback  - add backlink (when edges are conveted to the arcs)
 		"""
 		def linkToStream(fout, link):
+			"""Output link to the stream
+
+			Args:
+				fout (File)  - Output file/stream
+				link (list)  - Processing link: [id:str, weight:str]
+			"""
 			fout.write(' ')
 			if link[1] and link[1] != '1':  # float(link[1]) != 1
 				fout.write(':'.join((link[0], link[1])))
@@ -755,7 +764,16 @@ def printBlockNsl(directed):
 			makeback  - add backlink (when edges are conveted to the arcs)
 			"""
 			def linkToStr(src, link):
-				if(outfmt.printed.weighted):
+				"""Convert link to string representation
+
+				Args:
+					src (str)  - source id
+					link ([str])  - link: [dstId:str, weight:str]
+
+				Returns:
+					str  - stringified link
+				"""
+				if outfmt.printed.weighted:
 					line = ' '.join((src, link[0], link[1] or '1'))
 				else:
 					line = ' '.join((src, link[0]))
@@ -801,11 +819,11 @@ def convertStream(fout, outfmt, finp, inpfmt, unweight, remdub, frcedg, commente
 	# arbitrary order, so the per-block input parcing with per-block output forming
 	# are appropriate.
 
-	# Parse header only if exists and form resutls considering for the (un)directed case
+	# Parse header only if exists and form results considering for the (un)directed case
 	assert inpfmt.parsed.directed is None and outfmt.printed.directed is None, 'Inicialization validation failed'
 
 	# Parse the remained part(s) of the input file and build the output
-	while(inpfmt.parseBlock(finp, unweight)):  # DEFAULT_BLOCK_LINKS
+	while inpfmt.parseBlock(finp, unweight):  # DEFAULT_BLOCK_LINKS
 		outfmt.printBlock(fout, inpfmt.parsed, remdub, frcedg, commented, unweight)
 	# Finalize the outut
 	outfmt.printBlock(fout, inpfmt.parsed, remdub, frcedg, commented, unweight, True)
@@ -859,7 +877,7 @@ class FormatSpec(object):
 			inpoutp += 'OUTP'
 		intro = '{} ({inpoutp})  - {descr}. File extensions: {exts}'.format(self.id
 			, inpoutp=inpoutp, descr=self.descr, exts=', '.join(self.exts))
-		if self.fmt :
+		if self.fmt:
 			intro += '. Specification:' + self.fmt
 			if self.fmtdescr:
 				intro = '{base}\n  Notations:\n{fmtdescr}'.format(base=intro, fmtdescr=self.fmtdescr)
@@ -870,12 +888,14 @@ class FormatSpec(object):
 		return self.id
 
 	def parseBlock(self, *args):
+		"""Parse block"""
 		if self.__parser:
 			return self.__parser(self, *args)
 		else:
 			raise AttributeError('The parser was not set')
 
 	def printBlock(self, *args):
+		"""Print block"""
 		if self.__printer:
 			return self.__printer(self, *args)
 		else:
@@ -927,7 +947,7 @@ def inputFormats():
 {0}...
 """.format(ntspan)
 		, fmtdescr=
-"""{0}The header is optional. The arcs (directed links) are unique and always in pairs, i.e. BA should be specified until it's weight is zero if AB is specified.
+"""{0}The header is optional. The arcs (directed links) are unique and always in pairs, i.e. BA should be specified until its weight is zero if AB is specified.
 {0}Id is a positive integer number (>= 1), id range is solid.
 {0}Weight is a non-negative floating point number.""".format(ntspan))
 
@@ -1023,7 +1043,7 @@ def convert(args):
 				convertStream(fout, args.outfmt, finp, args.inpfmt, args.unweight, args.remdub
 					, args.frcedg, args.commented)
 				print('{} -> {} conversion is completed'.format(args.network, foutName))
-		except StandardError:
+		except (IOError, ValueError):
 			# Remove incomplete output file
 			if os.path.exists(foutName):
 				os.remove(foutName)
@@ -1045,7 +1065,7 @@ def parseArgs(params=None):
 		' from any non-negative number and might not form a solid range. RCG is a'
 		' readable and compact network format suitable for the evolving networks.'
 # Headers have weighted attribute to represented optinally weighted lists of links (edges or arvs).
-# Node weigh is specidied via selflink(s). Weights are explicitly separated from ids for the readability.', printer=printBlockRcg
+# Node weigh is specified via selflink(s). Weights are explicitly separated from ids for the readability.', printer=printBlockRcg
 		, printer=printBlockRcg, exts=('rcg', 'hig'))
 
 	# Specify and process input arguments
@@ -1088,7 +1108,7 @@ def parseArgs(params=None):
 		' r  - rename the existing output file and create the new one,'
 		' s  - skip processing if such output file already exists')
 
-	args = parser.parse_args()
+	args = parser.parse_args(params)
 	#print('Args: ' + ' '.join(dir(args)))
 
 	# Show detailed format specifiction and exit if required
@@ -1124,6 +1144,3 @@ def parseArgs(params=None):
 
 if __name__ == '__main__':
 	convert(parseArgs())
-
-
-__all__ = ["convert", "FormatSpec"]
